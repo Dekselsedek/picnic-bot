@@ -1,4 +1,5 @@
 import type { PicnicProduct, DeliverySlot } from '../types/index.js';
+import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 
 type PicnicLib = any;
 
@@ -110,14 +111,12 @@ export class PicnicService {
 
   async saveAuth(path = './data/picnic_auth.json') {
     if (!this._authKey) throw new Error('No auth key');
-    const { writeFileSync, mkdirSync } = await import('fs');
     mkdirSync('./data', { recursive: true });
     writeFileSync(path, JSON.stringify({ authKey: this._authKey, savedAt: new Date().toISOString() }));
   }
 
-  async loadAuth(path = './data/picnic_auth.json') {
+  loadAuth(path = './data/picnic_auth.json') {
     try {
-      const { readFileSync, existsSync } = await import('fs');
       if (!existsSync(path)) return;
       const data = JSON.parse(readFileSync(path, 'utf-8'));
       if (data.authKey) this._authKey = data.authKey;
