@@ -117,7 +117,7 @@ export class PicnicService {
 
   loadAuth(path = './data/picnic_auth.json') {
     try {
-      const { readFileSync, existsSync } = require('node:fs');
+      const { readFileSync, existsSync } = await import('fs');
       if (!existsSync(path)) return;
       const data = JSON.parse(readFileSync(path, 'utf-8'));
       if (data.authKey) this._authKey = data.authKey;

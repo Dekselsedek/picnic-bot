@@ -56,7 +56,7 @@ async function showNextItem(replyTarget: any, ps: PicnicService, userId: string)
     const p = products[0];
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder().setCustomId(`b_ja_${session.currentIndex}`).setLabel('Ja').setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId(`b_pick_${session.currentIndex}`).setLabel('Andere').setStyle(ButtonStyle.Secondary)
+      new ButtonBuilder().setCustomId(`b_other_${session.currentIndex}`).setLabel('Andere').setStyle(ButtonStyle.Secondary)
     );
     const msg = `**${item.name}**\n  \u2192 ${p.name} | ${fmt(p.price)}\n\nToevoegen?`;
     if ('update' in replyTarget) await replyTarget.update({ content: msg, components: [row] });
@@ -169,22 +169,7 @@ export const ORDER_COMMAND = {
 
     const customId: string = (interaction as any).customId ?? '';
 
-    if (customId.startsWith('b_ja_') || customId.startsWith('b_pick_')) {
-      const product = session.results[0];
-      if (product) {
-        session.resolved.push({
-          itemId: session.listItems[session.currentIndex].id,
-          productId: product.id,
-          name: product.name,
-          price: product.price,
-        });
-        await interaction.update({ content: `+ ${product.name}`, components: [] });
-        session.currentIndex++;
-        const ps = new PicnicService();
-        ps.loadAuth();
-        await showNextItem(interaction, ps, userId);
-      }
-    } else if (customId.startsWith('b_pick_') && interaction.isSelectMenu()) {
+    if (interaction.isSelectMenu()) {
       const value = interaction.values[0];
       if (value === 'skip') {
         await interaction.update({ content: 'Overgeslagen.', components: [] });
@@ -209,6 +194,27 @@ export const ORDER_COMMAND = {
         ps.loadAuth();
         await showNextItem(interaction, ps, userId);
       }
+    } else if (customId.startsWith('b_ja_')) {
+      const product = session.results[0];
+      if (product) {
+        session.resolved.push({
+          itemId: session.listItems[session.currentIndex].id,
+          productId: product.id,
+          name: product.name,
+          price: product.price,
+        });
+        await interaction.update({ content: `+ ${product.name}`, components: [] });
+        session.currentIndex++;
+        const ps = new PicnicService();
+        ps.loadAuth();
+        await showNextItem(interaction, ps, userId);
+      }
+    } else if (customId.startsWith('b_other_')) {
+      await interaction.update({ content: 'Overgeslagen.', components: [] });
+      session.currentIndex++;
+      const ps = new PicnicService();
+      ps.loadAuth();
+      await showNextItem(interaction, ps, userId);
     }
   },
 };
