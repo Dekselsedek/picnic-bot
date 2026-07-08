@@ -1,0 +1,2 @@
+# picnic-bot
+agentic shopping
