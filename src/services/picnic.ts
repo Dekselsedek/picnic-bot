@@ -115,7 +115,7 @@ export class PicnicService {
     writeFileSync(path, JSON.stringify({ authKey: this._authKey, savedAt: new Date().toISOString() }));
   }
 
-  loadAuth(path = './data/picnic_auth.json') {
+  async loadAuth(path = './data/picnic_auth.json') {
     try {
       const { readFileSync, existsSync } = await import('fs');
       if (!existsSync(path)) return;
